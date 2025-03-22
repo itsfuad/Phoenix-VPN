@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+# Add permissions to create releases
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Create Release
@@ -42,7 +46,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Phoenix VPN ${{ github.ref }}
+        release_name: Phoenix VPN ${{ github.ref_name }}
         draft: false
         prerelease: false
     
