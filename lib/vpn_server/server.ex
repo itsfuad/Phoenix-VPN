@@ -2,25 +2,32 @@ defmodule VpnServer.Server do
   use GenServer
   require Logger
 
-  @default_port 1723  # Standard PPTP port
+  # Standard PPTP port
+  @default_port 1723
 
   def start_link(opts \\ []) do
     port = Keyword.get(opts, :port, @default_port)
-    GenServer.start_link(__MODULE__, %{
-      port: port,
-      config: nil,
-      listen_socket: nil,
-      acceptor_pid: nil
-    }, name: __MODULE__)
+
+    GenServer.start_link(
+      __MODULE__,
+      %{
+        port: port,
+        config: nil,
+        listen_socket: nil,
+        acceptor_pid: nil
+      },
+      name: __MODULE__
+    )
   end
 
   def init(state) do
-    {:ok, listen_socket} = :gen_tcp.listen(state.port, [
-      :binary,
-      packet: :raw,
-      active: false,
-      reuseaddr: true
-    ])
+    {:ok, listen_socket} =
+      :gen_tcp.listen(state.port, [
+        :binary,
+        packet: :raw,
+        active: false,
+        reuseaddr: true
+      ])
 
     config = VpnServer.Config.new()
     Logger.info("VPN Server listening on port #{state.port}")
@@ -55,6 +62,7 @@ defmodule VpnServer.Server do
           {:ok, response} ->
             :gen_tcp.send(socket, response)
             handle_client(socket, config)
+
           {:error, reason} ->
             Logger.error("Failed to process PPTP packet: #{inspect(reason)}")
             :gen_tcp.close(socket)
@@ -78,9 +86,11 @@ defmodule VpnServer.Server do
             ip_address = assign_ip_address()
             {:ok, _pid} = VpnServer.Session.start_link(socket, username, ip_address)
             create_success_response(packet)
+
           {:error, reason} ->
             create_error_response(packet, reason)
         end
+
       {:error, reason} ->
         {:error, reason}
     end
@@ -92,6 +102,7 @@ defmodule VpnServer.Server do
     case extract_credentials(packet.payload) do
       {:ok, {username, password}} ->
         VpnServer.Config.authenticate_user(username, password)
+
       {:error, reason} ->
         {:error, reason}
     end
@@ -115,30 +126,52 @@ defmodule VpnServer.Server do
   defp create_success_response(packet) do
     # Create a PPTP Control-Connection-Reply packet
     response = <<
-      1,    # version
-      0,    # reserved
-      2, 0, # message_type (Control-Connection-Reply)
-      12, 0,# length (little-endian)
-      packet.call_id::little-16, # call_id (little-endian)
-      packet.sequence_number::little-32, # sequence_number (little-endian)
-      packet.sequence_number::little-32, # acknowledgment_number (little-endian)
-      "Authentication successful"::binary # payload
+      # version
+      1,
+      # reserved
+      0,
+      # message_type (Control-Connection-Reply)
+      2,
+      0,
+      # length (little-endian)
+      12,
+      0,
+      # call_id (little-endian)
+      packet.call_id::little-16,
+      # sequence_number (little-endian)
+      packet.sequence_number::little-32,
+      # acknowledgment_number (little-endian)
+      packet.sequence_number::little-32,
+      # payload
+      "Authentication successful"::binary
     >>
+
     {:ok, response}
   end
 
   defp create_error_response(packet, reason) do
     # Create a PPTP Control-Connection-Reply packet with error
     response = <<
-      1,    # version
-      0,    # reserved
-      2, 0, # message_type (Control-Connection-Reply)
-      12, 0,# length (little-endian)
-      packet.call_id::little-16, # call_id (little-endian)
-      packet.sequence_number::little-32, # sequence_number (little-endian)
-      packet.sequence_number::little-32, # acknowledgment_number (little-endian)
-      "Authentication failed: #{inspect(reason)}"::binary # payload
+      # version
+      1,
+      # reserved
+      0,
+      # message_type (Control-Connection-Reply)
+      2,
+      0,
+      # length (little-endian)
+      12,
+      0,
+      # call_id (little-endian)
+      packet.call_id::little-16,
+      # sequence_number (little-endian)
+      packet.sequence_number::little-32,
+      # acknowledgment_number (little-endian)
+      packet.sequence_number::little-32,
+      # payload
+      "Authentication failed: #{inspect(reason)}"::binary
     >>
+
     {:ok, response}
   end
 end

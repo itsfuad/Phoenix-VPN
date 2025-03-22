@@ -13,7 +13,8 @@ defmodule VpnServer.Config do
   def new do
     %__MODULE__{
       users: %{
-        "admin" => "admin123"  # Replace with secure credentials in production
+        # Replace with secure credentials in production
+        "admin" => "admin123"
       },
       ip_pool_start: "10.0.0.2",
       ip_pool_end: "10.0.0.254",
@@ -25,8 +26,10 @@ defmodule VpnServer.Config do
     case get_user_password(username) do
       {:ok, stored_password} when stored_password == password ->
         {:ok, username}
+
       {:ok, _} ->
         {:error, :invalid_password}
+
       {:error, _} ->
         {:error, :user_not_found}
     end
@@ -36,6 +39,7 @@ defmodule VpnServer.Config do
     case Application.get_env(:vpn_server, :users) do
       nil ->
         {:error, :user_not_found}
+
       users ->
         case Map.get(users, username) do
           nil -> {:error, :user_not_found}

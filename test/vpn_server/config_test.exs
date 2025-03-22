@@ -7,6 +7,7 @@ defmodule VpnServer.ConfigTest do
     Application.put_env(:vpn_server, :users, %{
       "test_user" => "test_password"
     })
+
     :ok
   end
 

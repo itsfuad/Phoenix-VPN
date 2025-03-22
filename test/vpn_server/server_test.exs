@@ -2,35 +2,45 @@ defmodule VpnServer.ServerTest do
   use ExUnit.Case
   alias VpnServer.Server
 
-  @test_port 1723  # Use the default PPTP port
+  # Use the default PPTP port
+  @test_port 1723
 
   setup do
     # Stop any existing server
     if Process.whereis(Server) do
       Process.exit(Process.whereis(Server), :normal)
-      Process.sleep(100)  # Give it time to exit
+      # Give it time to exit
+      Process.sleep(100)
     end
 
     # Start the server with a test port
     case Server.start_link(port: @test_port) do
       {:ok, pid} ->
-        Process.sleep(100)  # Give it time to initialize
+        # Give it time to initialize
+        Process.sleep(100)
+
         on_exit(fn ->
           if Process.alive?(pid) do
             Process.exit(pid, :normal)
             Process.sleep(100)
           end
         end)
+
         {:ok, %{pid: pid}}
+
       {:error, {:already_started, pid}} ->
-        Process.sleep(100)  # Give it time to initialize
+        # Give it time to initialize
+        Process.sleep(100)
+
         on_exit(fn ->
           if Process.alive?(pid) do
             Process.exit(pid, :normal)
             Process.sleep(100)
           end
         end)
+
         {:ok, %{pid: pid}}
+
       error ->
         flunk("Failed to start server: #{inspect(error)}")
     end
@@ -54,11 +64,12 @@ defmodule VpnServer.ServerTest do
       Process.sleep(100)
 
       # Create a test client socket
-      {:ok, client_socket} = :gen_tcp.connect(~c"127.0.0.1", @test_port, [
-        :binary,
-        packet: :raw,
-        active: false
-      ])
+      {:ok, client_socket} =
+        :gen_tcp.connect(~c"127.0.0.1", @test_port, [
+          :binary,
+          packet: :raw,
+          active: false
+        ])
 
       # Give the server time to accept the connection
       Process.sleep(100)
@@ -77,22 +88,40 @@ defmodule VpnServer.ServerTest do
       Process.sleep(100)
 
       # Create a test client socket
-      {:ok, client_socket} = :gen_tcp.connect(~c"127.0.0.1", @test_port, [
-        :binary,
-        packet: :raw,
-        active: false
-      ])
+      {:ok, client_socket} =
+        :gen_tcp.connect(~c"127.0.0.1", @test_port, [
+          :binary,
+          packet: :raw,
+          active: false
+        ])
 
       # Create a test PPTP packet with credentials
       packet = <<
-        1,    # version
-        0,    # reserved
-        1, 0, # message_type (Start-Control-Connection-Request)
-        12, 0,# length (little-endian)
-        1, 0, # call_id (little-endian)
-        1, 0, 0, 0, # sequence_number (little-endian)
-        0, 0, 0, 0, # acknowledgment_number (little-endian)
-        "admin:admin123"::binary # payload with credentials
+        # version
+        1,
+        # reserved
+        0,
+        # message_type (Start-Control-Connection-Request)
+        1,
+        0,
+        # length (little-endian)
+        12,
+        0,
+        # call_id (little-endian)
+        1,
+        0,
+        # sequence_number (little-endian)
+        1,
+        0,
+        0,
+        0,
+        # acknowledgment_number (little-endian)
+        0,
+        0,
+        0,
+        0,
+        # payload with credentials
+        "admin:admin123"::binary
       >>
 
       # Send the packet
@@ -110,11 +139,12 @@ defmodule VpnServer.ServerTest do
       Process.sleep(100)
 
       # Create a test client socket
-      {:ok, client_socket} = :gen_tcp.connect(~c"127.0.0.1", @test_port, [
-        :binary,
-        packet: :raw,
-        active: false
-      ])
+      {:ok, client_socket} =
+        :gen_tcp.connect(~c"127.0.0.1", @test_port, [
+          :binary,
+          packet: :raw,
+          active: false
+        ])
 
       # Send invalid packet
       :gen_tcp.send(client_socket, <<1, 2, 3>>)

@@ -31,6 +31,7 @@ defmodule VpnServer.Session do
     case VpnServer.PPTPProtocol.parse_packet(data) do
       {:ok, packet} ->
         handle_packet(packet, state)
+
       {:error, reason} ->
         Logger.error("Failed to parse PPTP packet: #{inspect(reason)}")
         {:noreply, state}
@@ -49,12 +50,18 @@ defmodule VpnServer.Session do
 
   defp handle_packet(packet, state) do
     case packet.message_type do
-      1 -> # Start-Control-Connection-Request
+      # Start-Control-Connection-Request
+      1 ->
         handle_control_connection_request(packet, state)
-      3 -> # Echo-Request
+
+      # Echo-Request
+      3 ->
         handle_echo_request(packet, state)
-      5 -> # Outgoing-Call-Request
+
+      # Outgoing-Call-Request
+      5 ->
         handle_outgoing_call_request(packet, state)
+
       _ ->
         Logger.warning("Unhandled PPTP message type: #{packet.message_type}")
         {:noreply, state}
@@ -62,19 +69,23 @@ defmodule VpnServer.Session do
   end
 
   defp handle_control_connection_request(packet, state) do
-    response = VpnServer.PPTPProtocol.create_control_connection_reply(
-      packet.call_id,
-      packet.sequence_number
-    )
+    response =
+      VpnServer.PPTPProtocol.create_control_connection_reply(
+        packet.call_id,
+        packet.sequence_number
+      )
+
     :gen_tcp.send(state.socket, VpnServer.PPTPProtocol.build_packet(response))
     {:noreply, %{state | sequence_number: state.sequence_number + 1}}
   end
 
   defp handle_echo_request(packet, state) do
-    response = VpnServer.PPTPProtocol.create_echo_reply(
-      packet.call_id,
-      packet.sequence_number
-    )
+    response =
+      VpnServer.PPTPProtocol.create_echo_reply(
+        packet.call_id,
+        packet.sequence_number
+      )
+
     :gen_tcp.send(state.socket, VpnServer.PPTPProtocol.build_packet(response))
     {:noreply, %{state | sequence_number: state.sequence_number + 1}}
   end
@@ -84,13 +95,15 @@ defmodule VpnServer.Session do
     # For now, just acknowledge the request
     response = %VpnServer.PPTPProtocol{
       version: 1,
-      message_type: 6, # Outgoing-Call-Reply
+      # Outgoing-Call-Reply
+      message_type: 6,
       length: 12,
       call_id: packet.call_id,
       sequence_number: state.sequence_number,
       acknowledgment_number: packet.sequence_number,
       payload: <<>>
     }
+
     :gen_tcp.send(state.socket, VpnServer.PPTPProtocol.build_packet(response))
     {:noreply, %{state | sequence_number: state.sequence_number + 1}}
   end

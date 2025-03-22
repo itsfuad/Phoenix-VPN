@@ -32,17 +32,18 @@ defmodule VpnServer.PPTPProtocol do
 
   def parse_packet(data) do
     case data do
-      <<version::8, _reserved::8, message_type::little-16, length::little-16,
-        call_id::little-16, seq_num::little-32, ack_num::little-32, payload::binary>> ->
-        {:ok, %__MODULE__{
-          version: version,
-          message_type: message_type,
-          length: length,
-          call_id: call_id,
-          sequence_number: seq_num,
-          acknowledgment_number: ack_num,
-          payload: payload
-        }}
+      <<version::8, _reserved::8, message_type::little-16, length::little-16, call_id::little-16,
+        seq_num::little-32, ack_num::little-32, payload::binary>> ->
+        {:ok,
+         %__MODULE__{
+           version: version,
+           message_type: message_type,
+           length: length,
+           call_id: call_id,
+           sequence_number: seq_num,
+           acknowledgment_number: ack_num,
+           payload: payload
+         }}
 
       _ ->
         {:error, :invalid_packet_format}
@@ -59,7 +60,8 @@ defmodule VpnServer.PPTPProtocol do
 
     <<
       packet.version::8,
-      0::8,  # Reserved
+      # Reserved
+      0::8,
       packet.message_type::little-16,
       total_length::little-16,
       packet.call_id::little-16,

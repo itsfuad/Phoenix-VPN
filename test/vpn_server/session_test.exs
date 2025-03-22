@@ -5,9 +5,11 @@ defmodule VpnServer.SessionTest do
   setup do
     # Create a mock socket for testing
     {:ok, socket} = :gen_tcp.listen(0, [:binary, packet: :raw, active: false])
+
     on_exit(fn ->
       :gen_tcp.close(socket)
     end)
+
     {:ok, %{socket: socket}}
   end
 
@@ -40,14 +42,31 @@ defmodule VpnServer.SessionTest do
 
       # Create a test PPTP packet
       packet = <<
-        1,    # version
-        0,    # reserved
-        1, 0, # message_type (Start-Control-Connection-Request)
-        12, 0,# length
-        1, 0, # call_id
-        1, 0, 0, 0, # sequence_number
-        0, 0, 0, 0, # acknowledgment_number
-        "test"::binary # payload
+        # version
+        1,
+        # reserved
+        0,
+        # message_type (Start-Control-Connection-Request)
+        1,
+        0,
+        # length
+        12,
+        0,
+        # call_id
+        1,
+        0,
+        # sequence_number
+        1,
+        0,
+        0,
+        0,
+        # acknowledgment_number
+        0,
+        0,
+        0,
+        0,
+        # payload
+        "test"::binary
       >>
 
       # Send the packet to the session
