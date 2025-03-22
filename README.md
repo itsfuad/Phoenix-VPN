@@ -1,6 +1,8 @@
 # Phoenix VPN
 
-A robust PPTP VPN server implementation in Elixir.
+## About
+
+Built with Elixir, this project provides a robust PPTP VPN server designed for reliability and scalability. Leveraging Elixir’s concurrent capabilities, it efficiently manages multiple VPN connections while ensuring proper error handling and maintainability. The implementation is structured for easy enhancements, making it a solid foundation for further improvements in authentication, encryption, and network routing.
 
 ## Requirements
 
@@ -77,5 +79,14 @@ This is a basic implementation and should be enhanced with:
 
 ## License
 
-MIT
+This project is licensed under the Mozilla Public License 2.0. See the [LICENSE](LICENSE) file for details.
 
+## Acknowledgments
+- Thanks to the Elixir community for their support and resources.
+- Inspired by the simplicity and power of Elixir for network programming.
+- Special thanks to the authors of the Elixir and Erlang documentation for their invaluable insights.
+
+## Contributing
+Contributions are welcome! Please fork the repository and submit a pull request with your changes. Make sure to follow the coding style and include tests for any new features or bug fixes.
+- For major changes, please open an issue first to discuss what you would like to change.
+- Ensure your code passes all tests and adheres to the project's coding standards.
