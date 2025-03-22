@@ -32,8 +32,8 @@ defmodule VpnServer.PPTPProtocol do
 
   def parse_packet(data) do
     case data do
-      <<version::8, _reserved::8, message_type::16, length::16,
-        call_id::16, seq_num::32, ack_num::32, payload::binary>> ->
+      <<version::8, _reserved::8, message_type::little-16, length::little-16,
+        call_id::little-16, seq_num::little-32, ack_num::little-32, payload::binary>> ->
         {:ok, %__MODULE__{
           version: version,
           message_type: message_type,
@@ -50,15 +50,22 @@ defmodule VpnServer.PPTPProtocol do
   end
 
   def build_packet(%__MODULE__{} = packet) do
+    payload_size = byte_size(packet.payload)
+    total_length = 12 + payload_size
+
+    # Pad the payload to 4-byte boundary if needed
+    padding_size = rem(4 - rem(payload_size, 4), 4)
+    padded_payload = packet.payload <> :binary.copy(<<0>>, padding_size)
+
     <<
       packet.version::8,
       0::8,  # Reserved
-      packet.message_type::16,
-      packet.length::16,
-      packet.call_id::16,
-      packet.sequence_number::32,
-      packet.acknowledgment_number::32,
-      packet.payload::binary
+      packet.message_type::little-16,
+      total_length::little-16,
+      packet.call_id::little-16,
+      packet.sequence_number::little-32,
+      packet.acknowledgment_number::little-32,
+      padded_payload::binary
     >>
   end
 

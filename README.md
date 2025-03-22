@@ -1,12 +1,20 @@
-# Elixir VPN Server
+# Phoenix VPN
 
-A simple PPTP VPN server implementation in Elixir.
+A robust PPTP VPN server implementation in Elixir.
 
 ## Requirements
 
 - Elixir 1.14 or later
 - Erlang/OTP 24 or later
 - Windows client with PPTP VPN support
+
+## Project Structure
+
+- `lib/vpn_server/pptp_protocol.ex` - PPTP protocol implementation
+- `lib/vpn_server/server.ex` - TCP server for handling VPN connections
+- `lib/vpn_server/session.ex` - Session management for VPN clients
+- `lib/vpn_server/config.ex` - Configuration and user authentication
+- `lib/vpn_server/application.ex` - OTP application entry point
 
 ## Building and Running
 
@@ -25,6 +33,24 @@ mix compile
 mix run --no-halt
 ```
 
+## Testing
+
+Run the test suite with:
+
+```bash
+mix test
+```
+
+Note: The test output may show some error messages like "Failed to process PPTP packet" or "TCP error". These are expected and part of the test cases that verify error handling paths.
+
+## Default Credentials
+
+The default user account is:
+- Username: `admin`
+- Password: `admin123`
+
+You can modify these in `config/config.exs`.
+
 ## Windows Client Configuration
 
 1. Open Windows Settings
@@ -36,8 +62,8 @@ mix run --no-halt
    - Server name or address: Your server's IP address
    - VPN type: PPTP
    - Type of sign-in info: Username and password
-   - Username: (your username)
-   - Password: (your password)
+   - Username: `admin` (or your custom username)
+   - Password: `admin123` (or your custom password)
 5. Click Save
 
 ## Security Considerations

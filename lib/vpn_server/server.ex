@@ -6,7 +6,12 @@ defmodule VpnServer.Server do
 
   def start_link(opts \\ []) do
     port = Keyword.get(opts, :port, @default_port)
-    GenServer.start_link(__MODULE__, %{port: port}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, %{
+      port: port,
+      config: nil,
+      listen_socket: nil,
+      acceptor_pid: nil
+    }, name: __MODULE__)
   end
 
   def init(state) do
@@ -19,19 +24,27 @@ defmodule VpnServer.Server do
 
     config = VpnServer.Config.new()
     Logger.info("VPN Server listening on port #{state.port}")
-    {:ok, %{listen_socket: listen_socket, config: config}, {:continue, :accept}}
+
+    # Start a separate process for accepting connections
+    acceptor_pid = spawn_link(fn -> accept_connections(listen_socket, config) end)
+
+    {:ok, %{state | listen_socket: listen_socket, config: config, acceptor_pid: acceptor_pid}}
   end
 
-  def handle_continue(:accept, state) do
-    case :gen_tcp.accept(state.listen_socket) do
+  def handle_call(:get_state, _from, state) do
+    {:reply, state, state}
+  end
+
+  defp accept_connections(listen_socket, config) do
+    case :gen_tcp.accept(listen_socket) do
       {:ok, socket} ->
         Logger.info("New VPN connection accepted")
-        spawn_link(fn -> handle_client(socket, state.config) end)
-        {:noreply, state, {:continue, :accept}}
+        spawn_link(fn -> handle_client(socket, config) end)
+        accept_connections(listen_socket, config)
 
       {:error, reason} ->
         Logger.error("Failed to accept connection: #{inspect(reason)}")
-        {:noreply, state, {:continue, :accept}}
+        accept_connections(listen_socket, config)
     end
   end
 
@@ -100,28 +113,32 @@ defmodule VpnServer.Server do
   end
 
   defp create_success_response(packet) do
-    response = %VpnServer.PPTPProtocol{
-      version: 1,
-      message_type: 2, # Control-Connection-Reply
-      length: 12,
-      call_id: packet.call_id,
-      sequence_number: packet.sequence_number,
-      acknowledgment_number: packet.sequence_number,
-      payload: "Authentication successful"
-    }
-    {:ok, VpnServer.PPTPProtocol.build_packet(response)}
+    # Create a PPTP Control-Connection-Reply packet
+    response = <<
+      1,    # version
+      0,    # reserved
+      2, 0, # message_type (Control-Connection-Reply)
+      12, 0,# length (little-endian)
+      packet.call_id::little-16, # call_id (little-endian)
+      packet.sequence_number::little-32, # sequence_number (little-endian)
+      packet.sequence_number::little-32, # acknowledgment_number (little-endian)
+      "Authentication successful"::binary # payload
+    >>
+    {:ok, response}
   end
 
   defp create_error_response(packet, reason) do
-    response = %VpnServer.PPTPProtocol{
-      version: 1,
-      message_type: 2, # Control-Connection-Reply
-      length: 12,
-      call_id: packet.call_id,
-      sequence_number: packet.sequence_number,
-      acknowledgment_number: packet.sequence_number,
-      payload: "Authentication failed: #{inspect(reason)}"
-    }
-    {:ok, VpnServer.PPTPProtocol.build_packet(response)}
+    # Create a PPTP Control-Connection-Reply packet with error
+    response = <<
+      1,    # version
+      0,    # reserved
+      2, 0, # message_type (Control-Connection-Reply)
+      12, 0,# length (little-endian)
+      packet.call_id::little-16, # call_id (little-endian)
+      packet.sequence_number::little-32, # sequence_number (little-endian)
+      packet.sequence_number::little-32, # acknowledgment_number (little-endian)
+      "Authentication failed: #{inspect(reason)}"::binary # payload
+    >>
+    {:ok, response}
   end
 end
