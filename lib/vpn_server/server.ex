@@ -2,14 +2,15 @@ defmodule VpnServer.Server do
   use GenServer
   require Logger
 
-  @port 1723  # Standard PPTP port
+  @default_port 1723  # Standard PPTP port
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  def start_link(opts \\ []) do
+    port = Keyword.get(opts, :port, @default_port)
+    GenServer.start_link(__MODULE__, %{port: port}, name: __MODULE__)
   end
 
-  def init(_state) do
-    {:ok, listen_socket} = :gen_tcp.listen(@port, [
+  def init(state) do
+    {:ok, listen_socket} = :gen_tcp.listen(state.port, [
       :binary,
       packet: :raw,
       active: false,
@@ -17,7 +18,7 @@ defmodule VpnServer.Server do
     ])
 
     config = VpnServer.Config.new()
-    Logger.info("VPN Server listening on port #{@port}")
+    Logger.info("VPN Server listening on port #{state.port}")
     {:ok, %{listen_socket: listen_socket, config: config}, {:continue, :accept}}
   end
 
