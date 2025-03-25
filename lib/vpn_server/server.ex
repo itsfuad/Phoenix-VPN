@@ -57,6 +57,7 @@ defmodule VpnServer.Server do
       {:ok, ip} ->
         new_used_ips = MapSet.put(state.used_ips, ip)
         {:reply, {:ok, ip}, %{state | used_ips: new_used_ips}}
+
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
