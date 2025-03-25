@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  vpn:
+    build: .
+    container_name: vpn_server
+    ports:
+      - "1723:1723"
+    cap_add:
+      - NET_ADMIN    # Required for network configuration
+      - SYS_MODULE   # Required for IP forwarding
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: unless-stopped 

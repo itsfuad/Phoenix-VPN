@@ -7,7 +7,8 @@ defmodule VpnServer.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -22,5 +23,17 @@ defmodule VpnServer.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     []
+  end
+
+  defp releases do
+    [
+      vpn_server: [
+        include_executables_for: [:unix],
+        applications: [
+          vpn_server: :permanent
+        ],
+        steps: [:assemble, :tar]
+      ]
+    ]
   end
 end
