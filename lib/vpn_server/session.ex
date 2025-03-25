@@ -1,4 +1,4 @@
-defmodule VpnServer.Session do
+defmodule PhoenixVpn.Session do
   use GenServer
   require Logger
 
@@ -28,7 +28,7 @@ defmodule VpnServer.Session do
   end
 
   def handle_info({:tcp, _socket, data}, state) do
-    case VpnServer.PPTPProtocol.parse_packet(data) do
+    case PhoenixVpn.PPTPProtocol.parse_packet(data) do
       {:ok, packet} ->
         handle_packet(packet, state)
 
@@ -70,30 +70,30 @@ defmodule VpnServer.Session do
 
   defp handle_control_connection_request(packet, state) do
     response =
-      VpnServer.PPTPProtocol.create_control_connection_reply(
+      PhoenixVpn.PPTPProtocol.create_control_connection_reply(
         packet.call_id,
         packet.sequence_number
       )
 
-    :gen_tcp.send(state.socket, VpnServer.PPTPProtocol.build_packet(response))
+    :gen_tcp.send(state.socket, PhoenixVpn.PPTPProtocol.build_packet(response))
     {:noreply, %{state | sequence_number: state.sequence_number + 1}}
   end
 
   defp handle_echo_request(packet, state) do
     response =
-      VpnServer.PPTPProtocol.create_echo_reply(
+      PhoenixVpn.PPTPProtocol.create_echo_reply(
         packet.call_id,
         packet.sequence_number
       )
 
-    :gen_tcp.send(state.socket, VpnServer.PPTPProtocol.build_packet(response))
+    :gen_tcp.send(state.socket, PhoenixVpn.PPTPProtocol.build_packet(response))
     {:noreply, %{state | sequence_number: state.sequence_number + 1}}
   end
 
   defp handle_outgoing_call_request(packet, state) do
     # Here we would handle the actual VPN connection setup
     # For now, just acknowledge the request
-    response = %VpnServer.PPTPProtocol{
+    response = %PhoenixVpn.PPTPProtocol{
       version: 1,
       # Outgoing-Call-Reply
       message_type: 6,
@@ -104,7 +104,7 @@ defmodule VpnServer.Session do
       payload: <<>>
     }
 
-    :gen_tcp.send(state.socket, VpnServer.PPTPProtocol.build_packet(response))
+    :gen_tcp.send(state.socket, PhoenixVpn.PPTPProtocol.build_packet(response))
     {:noreply, %{state | sequence_number: state.sequence_number + 1}}
   end
 end

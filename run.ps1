@@ -1,4 +1,4 @@
-Write-Host "Starting VPN Server..."
+Write-Host "Starting Phoenix VPN Server..."
 Write-Host ""
 
 # Check if Elixir is installed
@@ -26,7 +26,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # Start the VPN server
 Write-Host ""
-Write-Host "VPN Server is starting..."
+Write-Host "Phoenix VPN Server is starting..."
 Write-Host "Press Ctrl+C to stop the server"
 Write-Host ""
 

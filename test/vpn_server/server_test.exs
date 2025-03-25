@@ -1,6 +1,6 @@
-defmodule VpnServer.ServerTest do
+defmodule PhoenixVpn.ServerTest do
   use ExUnit.Case
-  alias VpnServer.Server
+  alias PhoenixVpn.Server
 
   # Use the default PPTP port
   @test_port 1723

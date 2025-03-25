@@ -1,6 +1,6 @@
-defmodule VpnServer.SessionTest do
+defmodule PhoenixVpn.SessionTest do
   use ExUnit.Case
-  alias VpnServer.Session
+  alias PhoenixVpn.Session
 
   setup do
     # Create a mock socket for testing

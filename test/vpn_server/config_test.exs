@@ -1,10 +1,10 @@
-defmodule VpnServer.ConfigTest do
+defmodule PhoenixVpn.ConfigTest do
   use ExUnit.Case
-  alias VpnServer.Config
+  alias PhoenixVpn.Config
 
   setup do
     # Set up test configuration
-    Application.put_env(:vpn_server, :users, %{
+    Application.put_env(:phoenix_vpn, :users, %{
       "test_user" => "test_password"
     })
 

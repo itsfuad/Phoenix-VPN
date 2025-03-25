@@ -53,7 +53,7 @@ jobs:
     - name: Package release
       run: |
         cd _build/prod/rel/
-        tar czf phoenix_vpn.tar.gz vpn_server
+        tar czf phoenix_vpn.tar.gz phoenix_vpn
     
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1

@@ -12,11 +12,11 @@ Built with Elixir, this project provides a robust PPTP VPN server designed for r
 
 ## Project Structure
 
-- `lib/vpn_server/pptp_protocol.ex` - PPTP protocol implementation
-- `lib/vpn_server/server.ex` - TCP server for handling VPN connections
-- `lib/vpn_server/session.ex` - Session management for VPN clients
-- `lib/vpn_server/config.ex` - Configuration and user authentication
-- `lib/vpn_server/application.ex` - OTP application entry point
+- `lib/phoenix_vpn/pptp_protocol.ex` - PPTP protocol implementation
+- `lib/phoenix_vpn/server.ex` - TCP server for handling VPN connections
+- `lib/phoenix_vpn/session.ex` - Session management for VPN clients
+- `lib/phoenix_vpn/config.ex` - Configuration and user authentication
+- `lib/phoenix_vpn/application.ex` - OTP application entry point
 
 ## Building and Running
 

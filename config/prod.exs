@@ -4,7 +4,7 @@ config :logger,
   level: :info,
   format: "$time $metadata[$level] $message\n"
 
-config :vpn_server,
+config :phoenix_vpn,
   port: 1723,
   # Add your users here in format: {"username", "password"}
   users: [

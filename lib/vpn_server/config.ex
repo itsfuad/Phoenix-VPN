@@ -1,4 +1,4 @@
-defmodule VpnServer.Config do
+defmodule PhoenixVpn.Config do
   @moduledoc """
   Configuration module for VPN server settings and user credentials.
   """
@@ -36,7 +36,7 @@ defmodule VpnServer.Config do
   end
 
   defp get_user_password(username) do
-    case Application.get_env(:vpn_server, :users) do
+    case Application.get_env(:phoenix_vpn, :users) do
       nil ->
         {:error, :user_not_found}
 

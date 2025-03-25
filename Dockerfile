@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     build-base
 
 # Copy project files
-COPY mix.exs mix.lock ./
+COPY mix.exs ./
 COPY config config
 COPY lib lib
 
@@ -26,10 +26,12 @@ FROM alpine:3.18
 RUN apk add --no-cache \
     bash \
     iptables \
+    libgcc \
+    libstdc++ \
     ppp
 
 # Copy release from builder
-COPY --from=builder /app/_build/prod/rel/vpn_server /vpn_server
+COPY --from=builder /app/_build/prod/rel/phoenix_vpn /phoenix_vpn
 
 # Copy startup script
 COPY docker-entrypoint.sh /

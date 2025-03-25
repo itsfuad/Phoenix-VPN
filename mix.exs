@@ -1,9 +1,9 @@
-defmodule VpnServer.MixProject do
+defmodule PhoenixVpn.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :vpn_server,
+      app: :phoenix_vpn,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
@@ -16,7 +16,7 @@ defmodule VpnServer.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {VpnServer.Application, []}
+      mod: {PhoenixVpn.Application, []}
     ]
   end
 
@@ -27,10 +27,10 @@ defmodule VpnServer.MixProject do
 
   defp releases do
     [
-      vpn_server: [
+      phoenix_vpn: [
         include_executables_for: [:unix],
         applications: [
-          vpn_server: :permanent
+          phoenix_vpn: :permanent
         ],
         steps: [:assemble, :tar]
       ]

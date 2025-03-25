@@ -1,4 +1,4 @@
-defmodule VpnServer.Server do
+defmodule PhoenixVpn.Server do
   use GenServer
   require Logger
 
@@ -6,7 +6,7 @@ defmodule VpnServer.Server do
   @default_port 1723
   # Standard VPN IP configuration
   @vpn_network "10.8.0"
-  @vpn_server_ip "#{@vpn_network}.1"
+  @phoenix_vpn_ip "#{@vpn_network}.1"
   @vpn_pool_start "#{@vpn_network}.2"
   @vpn_pool_end "#{@vpn_network}.254"
 
@@ -14,7 +14,7 @@ defmodule VpnServer.Server do
     port = Keyword.get(opts, :port, @default_port)
 
     Logger.info("VPN Network: #{@vpn_network}.0/24")
-    Logger.info("VPN Server IP: #{@vpn_server_ip}")
+    Logger.info("VPN Server IP: #{@phoenix_vpn_ip}")
     Logger.info("Client IP Range: #{@vpn_pool_start} - #{@vpn_pool_end}")
 
     GenServer.start_link(
@@ -39,7 +39,7 @@ defmodule VpnServer.Server do
         reuseaddr: true
       ])
 
-    config = VpnServer.Config.new()
+    config = PhoenixVpn.Config.new()
     Logger.info("VPN Server listening on port #{state.port}")
 
     # Start a separate process for accepting connections
@@ -105,12 +105,12 @@ defmodule VpnServer.Server do
   end
 
   defp process_pptp_packet(data, socket, config) do
-    case VpnServer.PPTPProtocol.parse_packet(data) do
+    case PhoenixVpn.PPTPProtocol.parse_packet(data) do
       {:ok, packet} ->
         case authenticate_connection(packet, config) do
           {:ok, username} ->
             ip_address = assign_ip_address()
-            {:ok, _pid} = VpnServer.Session.start_link(socket, username, ip_address)
+            {:ok, _pid} = PhoenixVpn.Session.start_link(socket, username, ip_address)
             create_success_response(packet)
 
           {:error, reason} ->
@@ -127,7 +127,7 @@ defmodule VpnServer.Server do
     # This is a simplified version - in production, you'd need proper PPTP authentication
     case extract_credentials(packet.payload) do
       {:ok, {username, password}} ->
-        VpnServer.Config.authenticate_user(username, password)
+        PhoenixVpn.Config.authenticate_user(username, password)
 
       {:error, reason} ->
         {:error, reason}

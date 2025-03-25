@@ -1,6 +1,6 @@
-defmodule VpnServer.PPTPProtocolTest do
+defmodule PhoenixVpn.PPTPProtocolTest do
   use ExUnit.Case
-  alias VpnServer.PPTPProtocol
+  alias PhoenixVpn.PPTPProtocol
 
   describe "parse_packet/1" do
     test "parses a valid PPTP packet" do

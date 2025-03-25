@@ -31,7 +31,7 @@ sudo iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
 ### 3. Configure User Authentication
 Edit `config/prod.exs`:
 ```elixir
-config :vpn_server,
+config :phoenix_vpn,
   users: [
     {"username", "password"}
   ]
@@ -46,7 +46,7 @@ MIX_ENV=prod mix release
 
 2. Run Server:
 ```bash
-sudo _build/prod/rel/vpn_server/bin/vpn_server start
+sudo _build/prod/rel/phoenix_vpn/bin/phoenix_vpn start
 ```
 
 ## Client Setup
@@ -71,7 +71,7 @@ sudo _build/prod/rel/vpn_server/bin/vpn_server start
 
 1. Check server logs:
 ```bash
-_build/prod/rel/vpn_server/bin/vpn_server remote
+_build/prod/rel/phoenix_vpn/bin/phoenix_vpn remote
 ```
 
 2. Common Issues:

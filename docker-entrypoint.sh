@@ -10,4 +10,4 @@ iptables -A INPUT -p gre -j ACCEPT
 iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
 
 # Start VPN server
-exec /vpn_server/bin/vpn_server start 
+exec /phoenix_vpn/bin/phoenix_vpn start 

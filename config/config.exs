@@ -1,6 +1,6 @@
 import Config
 
-config :vpn_server,
+config :phoenix_vpn,
   users: %{
     # Replace with secure credentials in production
     "admin" => "admin123"

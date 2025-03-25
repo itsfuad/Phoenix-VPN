@@ -1,4 +1,4 @@
-defmodule VpnServer.PPTPProtocol do
+defmodule PhoenixVpn.PPTPProtocol do
   @moduledoc """
   Implements the PPTP (Point-to-Point Tunneling Protocol) specification.
   """
